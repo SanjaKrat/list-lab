@@ -1,0 +1,435 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>[hidden]{display:none!important}</style></head><body><title>Лабораторія списків</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Rubik:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: navy header with score, tab strip, one working panel per tab; same identity as the lesson slides (navy / yellow / blue, Unbounded + Rubik) */
+:root{
+  --bg:#F4F7FC; --paper:#FDFEFF; --ink:#172340; --ink2:#46526E; --muted:#56637F; --line:#C9D3EA; --line2:#E1E8F3;
+  --navy:#172340; --on-navy:#F4F7FC; --navy-2:#22305A; --yellow:#FFD447; --yellow-soft:#FFF4D1;
+  --blue:#2E5BFF; --blue-soft:#E4EAFF; --green:#16876A; --green-soft:#DDF3EC; --red:#C2324A; --red-soft:#FBE3E7;
+  --orange:#C25E00; --orange-soft:#FDEBD8; --violet:#7A4FD0; --violet-soft:#EEE6FB;
+  --display:'Unbounded','Arial Black',sans-serif; --body:'Rubik',Arial,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --bg:#0F172B; --paper:#18233D; --ink:#EEF2FA; --ink2:#BCC7DE; --muted:#9AA7C2; --line:#2C3A5C; --line2:#223050;
+    --navy:#0A1022; --navy-2:#1A2547; --yellow-soft:#3A3318; --blue:#7C9BFF; --blue-soft:#1F2C5A; --green:#3CC79F; --green-soft:#133A31;
+    --red:#FF8197; --red-soft:#43202A; --orange:#FFA95C; --orange-soft:#3D2A17; --violet:#B395F5; --violet-soft:#2D2346;}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+    --bg:#0F172B; --paper:#18233D; --ink:#EEF2FA; --ink2:#BCC7DE; --muted:#9AA7C2; --line:#2C3A5C; --line2:#223050;
+    --navy:#0A1022; --navy-2:#1A2547; --yellow-soft:#3A3318; --blue:#7C9BFF; --blue-soft:#1F2C5A; --green:#3CC79F; --green-soft:#133A31;
+    --red:#FF8197; --red-soft:#43202A; --orange:#FFA95C; --orange-soft:#3D2A17; --violet:#B395F5; --violet-soft:#2D2346;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+header.top{background:var(--navy);color:var(--on-navy);padding:22px 16px 0}
+.in{max-width:1040px;margin:0 auto}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--yellow)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(24px,4vw,36px);line-height:1.1;margin:6px 0 4px;text-wrap:balance}
+.hrow{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.hrow p{margin:0;color:#C9D3EA;max-width:560px}
+.score{display:flex;align-items:center;gap:10px;background:var(--navy-2);border-radius:14px;padding:8px 14px}
+.score b{font-family:var(--display);font-size:22px;color:var(--yellow);font-variant-numeric:tabular-nums}
+.score input{background:transparent;border:1px solid #46527A;color:var(--on-navy);border-radius:8px;padding:6px 8px;font:inherit;width:170px}
+.score input::placeholder{color:#8F9BBA}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;margin-top:18px;scrollbar-width:none}
+nav.tabs button{flex:0 0 auto;border:0;background:transparent;color:#C9D3EA;font:600 15px var(--body);padding:12px 16px;border-radius:12px 12px 0 0;cursor:pointer}
+nav.tabs button[aria-selected="true"]{background:var(--bg);color:var(--ink)}
+nav.tabs button .n{font-family:var(--display);font-size:12px;margin-right:6px;color:var(--yellow)}
+nav.tabs button[aria-selected="true"] .n{color:var(--blue)}
+nav.tabs button:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible,.tr-row:focus-visible,#trainer:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+main{max-width:1040px;margin:0 auto;padding:24px 16px 56px}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,26px);line-height:1.2;margin:0 0 6px;text-wrap:balance}
+h3{font-size:17px;font-weight:600;margin:0 0 8px}
+.lead{color:var(--ink2);margin:0 0 18px;max-width:720px}
+.card{background:var(--paper);border:1.5px solid var(--line);border-radius:16px;padding:16px 18px}
+.note{background:var(--yellow-soft);border-radius:14px;padding:12px 16px;color:var(--ink)}
+.note.b{background:var(--blue-soft)}
+.btn{font:600 15px var(--body);border-radius:10px;padding:9px 14px;cursor:pointer;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0F172B}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0F172B}}
+.btn:hover{border-color:var(--blue)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.grid2>*{min-width:0}
+
+/* decision helper */
+.algo{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+@media (max-width:760px){.algo{grid-template-columns:1fr}}
+.algo div{background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+.algo .q{font-weight:600}
+.algo .a{color:var(--ink2);font-size:15px}
+.algo .k{font-family:var(--display);font-size:12px;color:var(--blue);letter-spacing:1px}
+
+/* sort cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.sc{background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sc .t{font-weight:600;font-size:17px}
+.sc .t small{display:block;font-weight:400;color:var(--muted);font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{font:500 14px var(--body);border:1.5px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:6px 11px;cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.sc.ok{border-color:var(--green);background:var(--green-soft)}
+.sc.bad{border-color:var(--red);background:var(--red-soft)}
+.sc .ex{font-size:14px;color:var(--ink2)}
+.tag{display:inline-block;font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:6px}
+.tag.ok{background:var(--green);color:var(--paper)} .tag.bad{background:var(--red);color:var(--paper)}
+
+/* fragments */
+.frag{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-top:1px solid var(--line2)}
+.frag:first-of-type{border-top:0}
+.frag blockquote{margin:0;padding:10px 14px;background:var(--bg);border-left:4px solid var(--line);border-radius:0 10px 10px 0}
+.frag.ok blockquote{border-left-color:var(--green)} .frag.bad blockquote{border-left-color:var(--red)}
+.render{background:var(--paper);border:1.5px dashed var(--line);border-radius:14px;padding:14px 18px}
+.render ul,.render ol{margin:4px 0 10px;padding-left:26px}
+.quiz{display:flex;flex-direction:column;gap:14px}
+.qz .opts{flex-direction:column;align-items:flex-start}
+.qz .opt{border-radius:10px;text-align:left}
+.qz .opt.right{background:var(--green);border-color:var(--green);color:var(--paper)}
+.qz .opt.wrong{background:var(--red);border-color:var(--red);color:var(--paper)}
+
+/* trainer */
+.tr-wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+@media (max-width:820px){.tr-wrap{grid-template-columns:1fr}}
+.tr-wrap>*{min-width:0}
+#trainer{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:12px 8px;min-height:200px}
+#trainer:focus-within,#trainer:focus{border-color:var(--blue)}
+.tr-row{display:flex;gap:10px;align-items:baseline;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:17px;user-select:none}
+.tr-row .m{font-variant-numeric:tabular-nums;color:var(--blue);font-weight:600;min-width:46px;text-align:right;font-family:var(--mono);font-size:15px}
+.tr-row.sel{background:var(--blue-soft);outline:2px solid var(--blue)}
+.tr-row.wrong{background:var(--red-soft)}
+.tr-row.right{background:var(--green-soft)}
+.target{background:var(--bg);border-radius:14px;padding:12px 8px}
+.target .tr-row{cursor:default;font-size:15px;padding:3px 10px}
+.keys{display:flex;flex-wrap:wrap;gap:6px}
+kbd{font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:1px 6px}
+.status{font-weight:600}
+.status.ok{color:var(--green)} .status.bad{color:var(--red)}
+select,textarea,input.num{font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:10px;padding:7px 10px}
+
+/* fake vs real */
+.fr{font-size:17px}
+.fr .line{display:flex;gap:10px;padding:4px 8px;border-radius:6px}
+.fr .line .m{font-family:var(--mono);min-width:40px;text-align:right;color:var(--blue);font-weight:600}
+.fr .line.err .m{color:var(--red)} .fr .line.err{background:var(--red-soft)}
+.fr .line.new{background:var(--yellow-soft)}
+.fr .fake .m{color:var(--ink)}
+.fr .ws{color:var(--muted);font-family:var(--mono)}
+textarea{width:100%;min-height:190px;font-family:var(--mono);font-size:14px;line-height:1.5}
+pre.code{margin:0;font-family:var(--mono);font-size:13px;background:var(--navy);color:#DCE4F5;border-radius:12px;padding:12px 14px;overflow-x:auto;white-space:pre}
+pre.code .tg{color:var(--yellow)}
+
+/* cheat sheet */
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:9px 12px;border-bottom:1px solid var(--line2)}
+th{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--bg)}
+
+/* result */
+.res{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media (max-width:640px){.res{grid-template-columns:1fr}}
+.res .card b{font-family:var(--display);font-size:28px;font-variant-numeric:tabular-nums;color:var(--blue)}
+.stack{display:flex;flex-direction:column;gap:16px}
+@media (prefers-reduced-motion: no-preference){.sc,.frag blockquote,.tr-row{transition:background .2s,border-color .2s}}
+</style>
+
+<header class="top"><div class="in">
+  <div class="eyebrow">Інформатика · 7 клас · Урок 8 · §3</div>
+  <div class="hrow">
+    <div><h1>Лабораторія списків</h1>
+    <p>Вирішуй, сортуй, будуй дерева. Зірочки рахуються автоматично, наприкінці зроби знімок вкладки «Результат».</p></div>
+    <div class="score"><label for="who" class="eyebrow" style="letter-spacing:1.5px">Я</label><input id="who" placeholder="Ім’я та прізвище" autocomplete="off"><span>★ <b id="sc">0</b> / <span id="scmax">26</span></span></div>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-t="t1" aria-selected="true"><span class="n">1</span>Список чи таблиця?</button>
+    <button role="tab" data-t="t2" aria-selected="false"><span class="n">2</span>Знайди списки</button>
+    <button role="tab" data-t="t3" aria-selected="false"><span class="n">3</span>Тренажер рівнів</button>
+    <button role="tab" data-t="t4" aria-selected="false"><span class="n">4</span>Як працює список</button>
+    <button role="tab" data-t="t5" aria-selected="false"><span class="n">5</span>Шпаргалка</button>
+    <button role="tab" data-t="t6" aria-selected="false"><span class="n">★</span>Результат</button>
+  </nav>
+</div></header>
+
+<main>
+<!-- ============ TAB 1 ============ -->
+<section id="t1" class="stack">
+  <div><h2>Список чи таблиця?</h2>
+  <p class="lead">Завдання 1 підручника і ще кілька випадків із життя. Для кожного обери найкращий спосіб подання. Перед вибором постав собі три питання.</p></div>
+  <div class="algo">
+    <div><div class="k">ПИТАННЯ 1</div><div class="q">Кожен елемент має кілька характеристик?</div><div class="a">Так → <b>таблиця</b> (рядки × стовпці). Ні → це список, іди далі.</div></div>
+    <div><div class="k">ПИТАННЯ 2</div><div class="q">Є групи й підгрупи?</div><div class="a">Так → <b>багаторівневий</b> список (дерево).</div></div>
+    <div><div class="k">ПИТАННЯ 3</div><div class="q">Зміниться зміст, якщо переставити пункти?</div><div class="a">Так → <b>нумерований</b>. Ні → <b>маркований</b>.</div></div>
+  </div>
+  <div class="cards" id="cards"></div>
+  <div class="row"><button class="btn primary" id="chk1">Перевірити</button><button class="btn" id="rst1">Почати знову</button><span class="status" id="st1"></span></div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section id="t2" class="stack" hidden>
+  <div><h2>Знайди списки в тексті</h2>
+  <p class="lead">Як у завданні 2 підручника: прочитай текст і вирішуй, який фрагмент варто оформити списком і яким саме. Один фрагмент — пастка.</p></div>
+  <div class="card" id="frags"></div>
+  <div class="row"><button class="btn primary" id="chk2">Перевірити й показати результат</button><span class="status" id="st2"></span></div>
+  <div class="render" id="render2" hidden></div>
+  <div class="card"><h3>Правила, які варто знати</h3><div class="quiz" id="quiz"></div></div>
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section id="t3" class="stack" hidden>
+  <div><h2>Тренажер рівнів</h2>
+  <p class="lead">Багаторівневий список — це <b>дерево</b>: у кожного пункту є «батько» рівнем вище. Збудуй дерево як у зразку. Клацни на пункт і змінюй рівень клавішами, як у справжньому редакторі.</p></div>
+  <div class="row">
+    <label for="round">Раунд</label>
+    <select id="round"><option value="0">1 · Шкільні предмети</option><option value="1">2 · Пристрої комп’ютера</option></select>
+    <label for="fmt">Вигляд</label>
+    <select id="fmt"><option value="bul">● ○ ■ маркери</option><option value="num">1. a) i. нумерація</option><option value="legal">1. 1.1. 1.1.1.</option></select>
+  </div>
+  <div class="tr-wrap">
+    <div class="stack">
+      <div id="trainer" tabindex="0" aria-label="Список для тренування. Стрілки вгору і вниз обирають пункт, Tab і Shift+Tab змінюють рівень"></div>
+      <div class="keys">
+        <button class="btn" id="bUp">↑ пункт вище</button><button class="btn" id="bDn">↓ пункт нижче</button>
+        <button class="btn" id="bIn">Tab · рівень нижче →</button><button class="btn" id="bOut">← Shift+Tab · рівень вище</button>
+      </div>
+      <div class="row"><button class="btn primary" id="chk3">Перевірити</button><button class="btn" id="rst3">Скинути раунд</button><span class="status" id="st3"></span></div>
+    </div>
+    <div class="stack">
+      <div class="target"><div class="eyebrow" style="color:var(--muted);padding:0 10px 6px">Зразок</div><div id="target"></div></div>
+      <div class="note b" style="font-size:15px">Подивись на нумерацію «1. 1.1. 1.1.1.»: номер пункту — це <b>шлях</b> від кореня дерева. «2.1.3» означає: 2-й розділ → його 1-й підрозділ → 3-й пункт. Так нумерують підручники й закони.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TAB 4 ============ -->
+<section id="t4" class="stack" hidden>
+  <div><h2>Як працює список</h2>
+  <p class="lead">Чому номери не можна набирати вручну, і як списки «бачить» комп’ютер.</p></div>
+  <div class="grid2">
+    <div class="card fr"><h3>Фальшивий список</h3><p style="margin:0 0 8px;color:var(--ink2);font-size:15px">Номери набрано з клавіатури. <span class="ws">·</span> — пробіли, які теж набрали вручну.</p><div class="fake" id="fake"></div></div>
+    <div class="card fr"><h3>Справжній список</h3><p style="margin:0 0 8px;color:var(--ink2);font-size:15px">Номер — властивість абзацу. Редактор рахує сам.</p><div id="real"></div></div>
+  </div>
+  <div class="row">
+    <button class="btn primary" id="ins">Вставити пункт після 1-го</button>
+    <button class="btn" id="del">Видалити 1-й пункт</button>
+    <label for="startAt">Почати з</label><input class="num" id="startAt" type="number" min="1" max="99" value="1" style="width:76px">
+    <label for="rfmt">Формат</label><select id="rfmt"><option value="d.">1.</option><option value="d)">1)</option><option value="a)">a)</option><option value="I.">I.</option></select>
+    <button class="btn" id="rst4">Скинути</button>
+  </div>
+  <div class="note" id="fakeNote">Натисни «Вставити пункт» і подивись, що станеться з номерами в обох списках.</div>
+
+  <div class="card stack">
+    <div><h3>Списки в коді: Markdown → HTML</h3>
+    <p style="margin:0;color:var(--ink2)">Чат-боти, вікі, GitHub і навіть Google Документи розуміють <b>Markdown</b>: рядок з <code>- </code> стає маркером, з <code>1. </code> — номером, два пробіли на початку — рівень нижче. Вебсторінки зберігають списки тегами: <code>&lt;ul&gt;</code> — маркований, <code>&lt;ol&gt;</code> — нумерований, <code>&lt;li&gt;</code> — один пункт. Змінюй текст ліворуч.</p></div>
+    <div class="grid2">
+      <div><label for="md" class="eyebrow" style="color:var(--muted)">Markdown</label><textarea id="md" spellcheck="false"></textarea></div>
+      <div class="stack"><div><div class="eyebrow" style="color:var(--muted)">Як виглядає</div><div class="render" id="mdOut"></div></div></div>
+    </div>
+    <div><div class="eyebrow" style="color:var(--muted)">HTML-код сторінки</div><pre class="code" id="mdCode"></pre></div>
+  </div>
+</section>
+
+<!-- ============ TAB 5 ============ -->
+<section id="t5" class="stack" hidden>
+  <div><h2>Шпаргалка</h2><p class="lead">Те саме в Google Документах і Word. На Mac замість <kbd>Ctrl</kbd> — <kbd>Cmd</kbd>.</p></div>
+  <div class="tbl"><table>
+    <tr><th>Що зробити</th><th>Google Документи</th><th>Word</th></tr>
+    <tr><td>Маркований список</td><td><kbd>Ctrl+Shift+8</kbd> або кнопка на панелі</td><td>Основне → Маркери або <kbd>Ctrl+Shift+L</kbd></td></tr>
+    <tr><td>Нумерований список</td><td><kbd>Ctrl+Shift+7</kbd></td><td>Основне → Нумерація</td></tr>
+    <tr><td>Контрольний список (з квадратиками)</td><td><kbd>Ctrl+Shift+9</kbd></td><td>Маркер-символ ☐ (Визначити новий маркер → Символ)</td></tr>
+    <tr><td>Багаторівневий список</td><td>Будь-який список + <kbd>Tab</kbd></td><td>Основне → Багаторівневий список</td></tr>
+    <tr><td>Автосписок під час набору</td><td colspan="2">Набери <kbd>1.</kbd> або <kbd>-</kbd> / <kbd>*</kbd>, потім пробіл</td></tr>
+    <tr><td>Рівень нижче / вище</td><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd></td><td><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> або <kbd>Alt+Shift+→</kbd> / <kbd>←</kbd></td></tr>
+    <tr><td>Новий пункт</td><td colspan="2"><kbd>Enter</kbd></td></tr>
+    <tr><td>Новий рядок у тому самому пункті</td><td colspan="2"><kbd>Shift+Enter</kbd></td></tr>
+    <tr><td>Вийти зі списку</td><td colspan="2"><kbd>Enter</kbd> двічі (на порожньому пункті) або вимкнути кнопку списку</td></tr>
+    <tr><td>Змінити маркер або формат номерів</td><td>Стрілка біля кнопки списку або Формат → Маркери й нумерація</td><td>Стрілка біля кнопки Маркери / Нумерація</td></tr>
+    <tr><td>Почати нумерацію з 1</td><td>Правою кнопкою на номер → почати нумерацію спочатку</td><td>Правою кнопкою на номер → Почати знову з 1</td></tr>
+    <tr><td>Відступи списку</td><td colspan="2">Перетягни трикутники-маркери на лінійці (лінійка: Вигляд → Показати лінійку)</td></tr>
+    <tr><td>Побачити недруковані символи</td><td><kbd>Ctrl+Shift+P</kbd></td><td>Кнопка ¶ на вкладці Основне</td></tr>
+  </table></div>
+  <div class="note"><b>Пунктуація.</b> Пункти-речення після номера з крапкою (1.) — з великої літери, у кінці крапка. Пункти-слова й фрази після маркера або номера з дужкою (1), а)) — з малої літери, у кінці крапка з комою, після останнього — крапка.</div>
+</section>
+
+<!-- ============ TAB 6 ============ -->
+<section id="t6" class="stack" hidden>
+  <div><h2>Мій результат</h2><p class="lead" id="resWho">Впиши ім’я у верхньому рядку, зроби знімок екрана цієї вкладки й надішли вчителю.</p></div>
+  <div class="res">
+    <div class="card"><div class="eyebrow" style="color:var(--muted)">1 · Список чи таблиця</div><b id="r1">0</b> / 12</div>
+    <div class="card"><div class="eyebrow" style="color:var(--muted)">2 · Знайди списки + правила</div><b id="r2">0</b> / 8</div>
+    <div class="card"><div class="eyebrow" style="color:var(--muted)">3 · Тренажер рівнів</div><b id="r3">0</b> / 6</div>
+  </div>
+  <div class="card"><h3 id="verdict">Почни з вкладки 1</h3><p style="margin:0;color:var(--ink2)" id="when"></p></div>
+</section>
+</main>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S={who:'',p1:0,p2a:0,p2b:{},p3:[0,0]};
+try{const x=JSON.parse(localStorage.getItem('lists-lab')||'null'); if(x) S=Object.assign(S,x);}catch(e){}
+const save=()=>{try{localStorage.setItem('lists-lab',JSON.stringify(S));}catch(e){} };
+
+/* ---------- tabs ---------- */
+function show(id){ $$('nav.tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===id)); $$('main>section').forEach(s=>s.hidden=s.id!==id); if(id==='t6') renderRes(); }
+$$('nav.tabs button').forEach(b=>b.onclick=()=>{show(b.dataset.t); try{history.replaceState(null,'','#'+b.dataset.t);}catch(e){}});
+if(/^#t[1-6]$/.test(location.hash)) show(location.hash.slice(1));
+
+$('#who').value=S.who; $('#who').oninput=e=>{S.who=e.target.value; save();};
+
+function score(){ const p2=S.p2a+Object.values(S.p2b).filter(Boolean).length; const tot=S.p1+p2+S.p3[0]+S.p3[1]; $('#sc').textContent=tot; return {p2,tot}; }
+function renderRes(){ const {p2,tot}=score(); $('#r1').textContent=S.p1; $('#r2').textContent=p2; $('#r3').textContent=S.p3[0]+S.p3[1];
+  $('#resWho').textContent = S.who ? S.who+' · зроби знімок екрана цієї вкладки й надішли вчителю.' : 'Впиши ім’я у верхньому рядку, зроби знімок екрана цієї вкладки й надішли вчителю.';
+  $('#verdict').textContent = tot>=23?'★★★ Майстер списків':tot>=16?'★★ Впевнений користувач':tot>=8?'★ Добрий початок':'Почни з вкладки 1';
+  $('#when').textContent = 'Разом: '+tot+' з 26 зірочок · '+new Date().toLocaleString('uk-UA',{dateStyle:'short',timeStyle:'short'}); }
+
+/* ---------- TAB 1 ---------- */
+const T={bul:'Маркований',num:'Нумерований',multi:'Багаторівневий',table:'Таблиця'};
+const CARDS=[
+ {t:'План доповіді',ok:['num','multi'],ex:'Порядок частин важливий → нумерований. Якщо в плані є підпункти → багаторівневий нумерований.'},
+ {t:'Перелік складових страви',ok:['bul'],ex:'Борошно, яйця, молоко — переставиш, нічого не зміниться.'},
+ {t:'Покроковий рецепт приготування',ok:['num'],ex:'Кроки йдуть у часі: спершу збити яйця, потім пекти.'},
+ {t:'Список учнів класу',ok:['num','bul'],ex:'У журналі учнів нумерують за алфавітом: номер допомагає швидко знайти й порахувати. Маркований теж прийнятний.'},
+ {t:'Журнал успішності',ok:['table'],ex:'Кожен учень має багато оцінок за різні дати: дві осі (учні × дати) → таблиця.'},
+ {t:'Рейтинг спортсменів',ok:['num','table'],ex:'Місце в рейтингу і є номер. Якщо додати очки, країну, вік — уже таблиця.'},
+ {t:'Список навчальних предметів',ok:['bul'],ex:'Предмети рівноправні, порядку немає.'},
+ {t:'Результати матчів чемпіонату',ok:['table'],ex:'Команди, рахунок, дата, стадіон — кілька характеристик кожного матчу.'},
+ {t:'Зміст підручника',ok:['multi'],ex:'Розділи → параграфи → пункти: класичне дерево з нумерацією 1. / 1.1.',s:'бонус'},
+ {t:'Інструкція: як встановити гру',ok:['num'],ex:'Пропустиш або переставиш крок — нічого не запрацює.',s:'бонус'},
+ {t:'Розклад уроків на тиждень',ok:['table','multi'],ex:'Дні × номери уроків — таблиця. Багаторівневий список (день → уроки) теж можливий, але таблицю читати швидше.',s:'бонус'},
+ {t:'Покупки, згруповані за відділами магазину',ok:['multi'],ex:'Відділ «Молочне» → молоко, сир; «Овочі» → морква. Групи + підгрупи.',s:'бонус'},
+];
+let pick1={};
+function drawCards(checked){
+  $('#cards').innerHTML=CARDS.map((c,i)=>{
+    const st = checked ? (pick1[i]? (c.ok.includes(pick1[i])?'ok':'bad') : 'bad') : '';
+    return `<div class="sc ${st}"><div class="t">${esc(c.t)}${c.s?`<small>${c.s}</small>`:''}</div>
+      <div class="opts">${Object.keys(T).map(k=>`<button class="opt" data-i="${i}" data-k="${k}" aria-pressed="${pick1[i]===k}">${T[k]}</button>`).join('')}</div>
+      ${checked?`<div class="ex"><span class="tag ${st}">${st==='ok'?'Так':'Ні'}</span> ${esc(c.ex)}</div>`:''}</div>`;}).join('');
+  $$('#cards .opt').forEach(b=>b.onclick=()=>{pick1[b.dataset.i]=b.dataset.k; drawCards(false);});
+}
+drawCards(false);
+$('#chk1').onclick=()=>{ const n=CARDS.filter((c,i)=>c.ok.includes(pick1[i])).length; const done=Object.keys(pick1).length;
+  drawCards(true); S.p1=Math.max(S.p1,n); save(); score();
+  $('#st1').textContent = done<CARDS.length ? `Правильно ${n} з ${CARDS.length}. Ще ${CARDS.length-done} без відповіді.` : `Правильно ${n} з ${CARDS.length}.`;
+  $('#st1').className='status '+(n>=10?'ok':'bad'); };
+$('#rst1').onclick=()=>{pick1={}; drawCards(false); $('#st1').textContent='';};
+
+/* ---------- TAB 2 ---------- */
+const T2={none:'Не список',bul:'Маркований',num:'Нумерований',multi:'Багаторівневий'};
+const FR=[
+ {txt:'Добра презентація допомагає слухачам швидко зрозуміти головне.',ok:'none',ex:'Одне ціле речення без переліку — це звичайний абзац.'},
+ {txt:'Щоб зробити презентацію, спочатку обери тему, потім збери матеріали, після цього склади план слайдів, далі оформи слайди й нарешті відрепетируй виступ.',ok:'num',ex:'Слова «спочатку, потім, далі, нарешті» — сигнал послідовності → нумерований.'},
+ {txt:'Для роботи знадобляться: ноутбук або планшет, доступ до інтернету, зображення без авторських обмежень, шаблон презентації.',ok:'bul',ex:'Двокрапка й перелік рівноправних речей → маркований.'},
+ {txt:'Слайди бувають трьох видів: титульний (назва проєкту, автори), інформаційні (текст, схеми, фото) і підсумковий (висновки, джерела).',ok:'multi',ex:'Види слайдів, а в дужках — що в кожному. Дужки всередині переліку — підказка, що є другий рівень.'},
+];
+let pick2={};
+function drawFr(checked){
+  $('#frags').innerHTML=FR.map((f,i)=>{ const st=checked?(pick2[i]===f.ok?'ok':'bad'):'';
+    return `<div class="frag ${st}"><blockquote>${esc(f.txt)}</blockquote>
+    <div class="opts">${Object.keys(T2).map(k=>`<button class="opt" data-i="${i}" data-k="${k}" aria-pressed="${pick2[i]===k}">${T2[k]}</button>`).join('')}</div>
+    ${checked?`<div class="ex" style="font-size:14px;color:var(--ink2)"><span class="tag ${st}">${st==='ok'?'Так':'Правильно: '+T2[f.ok]}</span> ${esc(f.ex)}</div>`:''}</div>`;}).join('');
+  $$('#frags .opt').forEach(b=>b.onclick=()=>{pick2[b.dataset.i]=b.dataset.k; drawFr(false);});
+}
+drawFr(false);
+$('#chk2').onclick=()=>{ const n=FR.filter((f,i)=>pick2[i]===f.ok).length; drawFr(true); S.p2a=Math.max(S.p2a,n); save(); score();
+  $('#st2').textContent=`Правильно ${n} з ${FR.length}.`; $('#st2').className='status '+(n===4?'ok':'bad');
+  const r=$('#render2'); r.hidden=false; r.innerHTML=`<div class="eyebrow" style="color:var(--muted)">Так текст виглядає зі списками</div>
+  <p>Добра презентація допомагає слухачам швидко зрозуміти головне.</p><p>Щоб зробити презентацію:</p>
+  <ol><li>Обери тему.</li><li>Збери матеріали.</li><li>Склади план слайдів.</li><li>Оформи слайди.</li><li>Відрепетируй виступ.</li></ol>
+  <p>Для роботи знадобляться:</p><ul><li>ноутбук або планшет;</li><li>доступ до інтернету;</li><li>зображення без авторських обмежень;</li><li>шаблон презентації.</li></ul>
+  <p>Слайди бувають трьох видів:</p><ul><li>титульний<ul style="list-style:circle"><li>назва проєкту;</li><li>автори;</li></ul></li><li>інформаційні<ul style="list-style:circle"><li>текст;</li><li>схеми;</li><li>фото;</li></ul></li><li>підсумковий<ul style="list-style:circle"><li>висновки;</li><li>джерела.</li></ul></li></ul>`; };
+
+const QZ=[
+ {q:'Нумерований список із пунктів-речень: «1. Обери тему…». Як оформити кожен пункт?',o:['З великої літери, у кінці крапка','З малої літери, у кінці крапка з комою','З великої літери, без знака в кінці'],a:0},
+ {q:'Маркований список із пунктів-слів (ноутбук, інтернет, шаблон). Як оформити?',o:['З великої літери, у кінці крапка','З малої літери, крапка з комою, після останнього — крапка','Як завгодно, аби гарно'],a:1},
+ {q:'Ти на порожньому пункті списку натискаєш Enter. Що станеться?',o:['З’явиться ще один порожній пункт','Список закінчиться, курсор вийде зі списку','Документ збережеться'],a:1},
+ {q:'Тобі треба почати новий рядок, але в тому самому пункті списку (без нового номера). Що натиснути?',o:['Enter','Tab','Shift+Enter'],a:2},
+];
+function drawQz(){ $('#quiz').innerHTML=QZ.map((q,i)=>`<div class="qz"><div style="font-weight:600;margin-bottom:6px">${i+1}. ${esc(q.q)}</div><div class="opts">${q.o.map((o,j)=>{
+  const ans=S.p2b[i]!==undefined; const cls= ans? (j===q.a?'right':(S.p2b['c'+i]===j?'wrong':'')) : '';
+  return `<button class="opt ${cls}" data-i="${i}" data-j="${j}" ${ans?'disabled':''}>${esc(o)}</button>`;}).join('')}</div></div>`).join('');
+  $$('#quiz .opt').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,j=+b.dataset.j; S.p2b[i]=(j===QZ[i].a); S.p2b['c'+i]=j; save(); drawQz(); score();});
+}
+// keep numeric keys only in score
+const _score=score; score=function(){ const p2=S.p2a+[0,1,2,3].filter(i=>S.p2b[i]===true).length; const tot=S.p1+p2+S.p3[0]+S.p3[1]; $('#sc').textContent=tot; return {p2,tot}; };
+drawQz();
+
+/* ---------- TAB 3 ---------- */
+const ROUNDS=[
+ [['Точні науки',0],['Математика',1],['Алгебра',2],['Геометрія',2],['Інформатика',1],['Мови',0],['Українська мова',1],['Англійська мова',1],['Природничі науки',0],['Біологія',1],['Фізика',1]],
+ [['Пристрої введення',0],['Клавіатура',1],['Миша',1],['Мікрофон',1],['Пристрої виведення',0],['Монітор',1],['Принтер',1],['Пристрої пам’яті',0],['Внутрішня пам’ять',1],['Оперативна пам’ять',2],['SSD-диск',2],['Зовнішня пам’ять',1],['Флешка',2]],
+];
+let R=0, lv=[], sel=0;
+function markers(levels,fmt){ const c=[0,0,0]; return levels.map(l=>{ c[l]++; for(let k=l+1;k<3;k++) c[k]=0;
+  if(fmt==='bul') return ['●','○','■'][l];
+  if(fmt==='num') return [c[0]+'.', String.fromCharCode(96+c[1])+')', ['i','ii','iii','iv','v','vi'][c[2]-1]+'.'][l];
+  return c.slice(0,l+1).join('.')+'.'; }); }
+function rowHTML(text,l,m,extra,idx){ return `<div class="tr-row ${extra||''}" ${idx!==undefined?`data-i="${idx}"`:''} style="padding-left:${10+l*34}px"><span class="m">${m}</span><span>${esc(text)}</span></div>`; }
+function drawTr(check){
+  const r=ROUNDS[R], fmt=$('#fmt').value, m=markers(lv,fmt), mt=markers(r.map(x=>x[1]),fmt);
+  $('#trainer').innerHTML=r.map((x,i)=>rowHTML(x[0],lv[i],m[i],(i===sel?'sel ':'')+(check?(lv[i]===x[1]?'right':'wrong'):''),i)).join('');
+  $('#target').innerHTML=r.map((x,i)=>rowHTML(x[0],x[1],mt[i])).join('');
+  $$('#trainer .tr-row').forEach(el=>el.onclick=()=>{sel=+el.dataset.i; drawTr(false); $('#trainer').focus();});
+}
+function resetTr(){ lv=ROUNDS[R].map(()=>0); sel=0; $('#st3').textContent=''; drawTr(false); }
+function move(d){ sel=Math.max(0,Math.min(lv.length-1,sel+d)); drawTr(false); }
+function indent(d){ const max = sel===0?0:Math.min(2,lv[sel-1]+1); lv[sel]=Math.max(0,Math.min(max,lv[sel]+d));
+  if(d<0){ for(let k=sel+1;k<lv.length;k++){ const mx=Math.min(2,lv[k-1]+1); if(lv[k]>mx) lv[k]=mx; } }
+  drawTr(false); }
+$('#trainer').addEventListener('keydown',e=>{
+  if(e.key==='Tab'){ e.preventDefault(); indent(e.shiftKey?-1:1); }
+  else if(e.key==='ArrowDown'){ e.preventDefault(); move(1);} else if(e.key==='ArrowUp'){ e.preventDefault(); move(-1);}
+  else if(e.altKey&&e.shiftKey&&e.key==='ArrowRight'){e.preventDefault(); indent(1);} else if(e.altKey&&e.shiftKey&&e.key==='ArrowLeft'){e.preventDefault(); indent(-1);}
+});
+$('#bUp').onclick=()=>move(-1); $('#bDn').onclick=()=>move(1); $('#bIn').onclick=()=>indent(1); $('#bOut').onclick=()=>indent(-1);
+$('#round').onchange=e=>{R=+e.target.value; resetTr();}; $('#fmt').onchange=()=>drawTr(false);
+$('#rst3').onclick=resetTr;
+$('#chk3').onclick=()=>{ const r=ROUNDS[R]; const bad=r.filter((x,i)=>lv[i]!==x[1]).length; drawTr(true);
+  if(!bad){ S.p3[R]=3; save(); score(); $('#st3').textContent='Дерево зібрано! +3 ★'+(R===0?' Спробуй раунд 2.':''); $('#st3').className='status ok'; }
+  else { $('#st3').textContent='Ще '+bad+' пункт(и) не на своєму рівні. Червоні — виправ.'; $('#st3').className='status bad'; } };
+resetTr();
+
+/* ---------- TAB 4 ---------- */
+const BASE=['Заповнити анкету учасника.','Принести підписану згоду батьків.','Пройти огляд у медсестри.','Здати внесок на автобус.'];
+const NEW='Отримати бланк згоди.';
+let real=[], fake=[];
+function reset4(){ real=BASE.map(t=>({t})); fake=BASE.map((t,i)=>({m:(i+1)+'.',t})); $('#fakeNote').textContent='Натисни «Вставити пункт» і подивись, що станеться з номерами в обох списках.'; draw4(); }
+function fmtNum(n,f){ if(f==='a)') return String.fromCharCode(96+((n-1)%26)+1)+')';
+  if(f==='I.'){ const R=[[10,'X'],[9,'IX'],[5,'V'],[4,'IV'],[1,'I']]; let s='',x=n; for(const [v,c] of R) while(x>=v){s+=c;x-=v;} return s+'.'; }
+  return n+(f==='d)'?')':'.'); }
+function draw4(){ const st=Math.max(1,+$('#startAt').value||1), f=$('#rfmt').value;
+  $('#real').innerHTML=real.map((x,i)=>`<div class="line ${x.n?'new':''}"><span class="m">${fmtNum(st+i,f)}</span><span>${esc(x.t)}</span></div>`).join('');
+  const seen={}; $('#fake').innerHTML=fake.map((x,i)=>{ const expect=(i+1)+'.'; const err=x.m!==expect;
+    return `<div class="line ${err?'err':''} ${x.n?'new':''}"><span class="m">${esc(x.m)}</span><span><span class="ws">··</span>${esc(x.t)}</span></div>`;}).join(''); }
+$('#ins').onclick=()=>{ if(real.some(x=>x.n)) return; real.splice(1,0,{t:NEW,n:1}); fake.splice(1,0,{m:'2.',t:NEW,n:1}); draw4();
+  $('#fakeNote').innerHTML='<b>Справжній</b> список перенумерувався сам. У <b>фальшивому</b> тепер два пункти «2.», а 3 номери нижче треба переписувати вручну. У документі на 50 пунктів — 50 виправлень.'; };
+$('#del').onclick=()=>{ if(!real.length) return; real.shift(); fake.shift(); draw4(); $('#fakeNote').innerHTML='Видалили 1-й пункт. Справжній знову рахує з початку, а фальшивий тепер починається не з «1.».'; };
+$('#startAt').oninput=draw4; $('#rfmt').onchange=draw4; $('#rst4').onclick=()=>{$('#startAt').value=1; $('#rfmt').value='d.'; reset4();};
+reset4();
+
+// Markdown → HTML (lists only)
+const MD_DEFAULT='Похід у Карпати\n\nВізьми з собою:\n- одяг\n  - дощовик\n  - тепла кофта\n- їжа\n  - бутерброди\n\nПрограма дня:\n1. Збір біля школи\n2. Виїзд до Яремча\n3. Водоспад Пробій';
+function md2html(src){
+  const out=[]; const stack=[]; // {type, indent}
+  const close=(to)=>{ while(stack.length>to){ const s=stack.pop(); out.push('  '.repeat(stack.length*2+1)+'</li>'); out.push('  '.repeat(stack.length*2)+`</${s}>`);} };
+  for(const raw of src.split('\n')){
+    const m=raw.match(/^(\s*)([-*+]|\d+[.)])\s+(.*)$/);
+    if(!m){ close(0); if(raw.trim()) out.push(`<p>${esc(raw.trim())}</p>`); continue; }
+    const depth=Math.min(Math.floor(m[1].replace(/\t/g,'  ').length/2), stack.length);
+    const type=/\d/.test(m[2])?'ol':'ul';
+    if(depth<stack.length){ close(depth+1); out.push('  '.repeat(depth*2+1)+'</li>'); if(stack[depth]!==type){ out.push('  '.repeat(depth*2)+`</${stack.pop()}>`); stack.push(type); out.push('  '.repeat(depth*2)+`<${type}>`);} }
+    else { stack.push(type); out.push('  '.repeat(depth*2)+`<${type}>`); }
+    out.push('  '.repeat(depth*2+1)+`<li>${esc(m[3])}`);
+  }
+  close(0); return out.join('\n');
+}
+function drawMd(){ const h=md2html($('#md').value); $('#mdOut').innerHTML=h; $('#mdCode').innerHTML=esc(h).replace(/&lt;(\/?)(ul|ol|li|p)&gt;/g,'<span class="tg">&lt;$1$2&gt;</span>'); }
+$('#md').value=MD_DEFAULT; $('#md').oninput=drawMd; drawMd();
+
+score();
+})();
+</script>
+</body></html>
